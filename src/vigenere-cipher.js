@@ -20,13 +20,56 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(directMode = true){
+    this.directMode = directMode;
+    this.sample = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(message, key) {
+    if(!message || !key) throw new Error('Incorrect arguments!');
+    const preparedMessage = message.toUpperCase();
+    const preparedKey = key.padEnd(message.length, key).toUpperCase();
+    let resultMessage = '';
+    let checkCounter = 0;
+    for(let i=0; i<preparedMessage.length; i++){
+      if (!preparedMessage[i].match(/[A-Z]/)) {
+        resultMessage += preparedMessage[i];
+        continue;
+      }
+      else {
+        let keyLetterIndex = this.sample.indexOf(preparedKey[checkCounter]);
+        let messageLetterIndex = this.sample.indexOf(preparedMessage[i]);
+        let resultIndex = keyLetterIndex + messageLetterIndex;
+        if(resultIndex > 25) resultIndex -= 26;
+        const char = this.sample.charAt(resultIndex);
+        resultMessage += char;
+        checkCounter++;
+      }
+    }
+    return this.directMode ? resultMessage : resultMessage.split('').reverse().join('');
+  }
+  decrypt(message, key) {
+    if(!message || !key) throw new Error('Incorrect arguments!');
+    const preparedMessage = message.toUpperCase();
+    const preparedKey = key.padEnd(message.length, key).toUpperCase();
+    let resultMessage = '';
+    let checkCounter = 0;
+    for(let i=0; i<preparedMessage.length; i++){
+      if (!preparedMessage[i].match(/[A-Z]/)) {
+        resultMessage += preparedMessage[i];
+        continue;
+      }
+      else {
+        let keyLetterIndex = this.sample.indexOf(preparedKey[checkCounter]);
+        let messageLetterIndex = this.sample.indexOf(preparedMessage[i]);
+        let resultIndex = messageLetterIndex - keyLetterIndex;
+        if(resultIndex < 0) resultIndex += 26;
+        const char = this.sample.charAt(resultIndex);
+        resultMessage += char;
+        checkCounter++;
+      }
+    }
+    return this.directMode ? resultMessage : resultMessage.split('').reverse().join('');
   }
 }
 
